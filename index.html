@@ -2,37 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Updated Feature Set</title>
   <style>
-    /* Adjusted styles for menus */
+    /* Styles for new menus */
     #menuBar {
-      display: flex;
-      justify-content: space-around;
+      display: none; /* Hide old sidebar menu */
+    }
+    #fileMenu {
+      margin: 20px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
       padding: 10px;
-      background-color: #f4f4f4;
-      border-bottom: 2px solid #ccc;
     }
-    #menuBar div {
+    #themeMenu {
+      margin: 20px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      padding: 10px;
+    }
+    .menuOption {
       cursor: pointer;
-      font-size: 16px;
-    }
-    #themeSettings {
-      margin-top: 20px;
+      padding: 5px;
+      margin: 5px 0;
+      display: block;
     }
   </style>
 </head>
 <body>
-  <header id="menuBar">
-    <div id="new">New Menu</div>
-    <div id="saveFile">Save File</div>
-    <div id="exit">Exit</div>
-    <div id="themeSettings">Theme Options</div>
-  </header>
+  <!-- File Operations Menu -->
+  <nav id="fileMenu">
+    <h2>File Menu</h2>
+    <div class="menuOption" id="new">New Menu</div>
+    <div class="menuOption" id="saveFile">Save File</div>
+    <div class="menuOption" id="exit">Exit</div>
+  </nav>
 
-  <div id="mainContent">
+  <!-- Theme Options Menu -->
+  <nav id="themeMenu">
+    <h2>Theme and Appearance</h2>
+    <div class="menuOption" id="themeSettings">Change Theme</div>
+  </nav>
+
+  <main id="mainContent">
     <h1>Welcome to Updated Interface</h1>
     <p>Refreshed layout includes updates to menus, session save behavior, and personalization options.</p>
-  </div>
+  </main>
 </body>
 </html>
