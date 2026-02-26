@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="parchment">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Verse Engine — Phonetic Rhythmic Writing Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Vollkorn:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=Bitter:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600;700&family=Josefin+Sans:wght@300;400;600&family=Space+Mono:wght@400;700&family=Fira+Code:wght@400;500&family=Abril+Fatface&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[data-theme="parchment"]{--bg0:#f7f3e8;--bg1:#efe9dc;--bg2:#e7e1d4;--bg3:#dbd4c6;--ed:#fdfaf2;--tx:#2a2218;--tx2:#6b5e4e;--tx3:#a89880;--acc:#b86830;--acc2:#9e5828;--accd:rgba(184,104,48,.1);--tl:#3a7a5e;--tld:rgba(58,122,94,.1);--rd:#b84040;--gn:#4a8a4a;--bd:#cec6b4;--r:8px;--sh:0 2px 8px rgba(0,0,0,.06);--f-ed:'Vollkorn',Georgia,serif;--f-ui:'DM Sans','Outfit',sans-serif;--f-mo:'Source Code Pro','JetBrains Mono',monospace}
+[data-theme="twilight"]{--bg0:#0e0c14;--bg1:#16131e;--bg2:#1e1a28;--bg3:#272233;--ed:#1a1624;--tx:#e2daf0;--tx2:#9a90b0;--tx3:#5e5575;--acc:#e8a848;--acc2:#d49538;--accd:rgba(232,168,72,.12);--tl:#58c8a0;--tld:rgba(88,200,160,.12);--rd:#e05858;--gn:#6abf6a;--bd:#302a40;--r:8px;--sh:0 2px 12px rgba(0,0,0,.4);--f-ed:'Vollkorn',Georgia,serif;--f-ui:'DM Sans','Outfit',sans-serif;--f-mo:'Source Code Pro','JetBrains Mono',monospace}
+[data-theme="ember"]{--bg0:#141010;--bg1:#1c1614;--bg2:#261e1a;--bg3:#342820;--ed:#1e1612;--tx:#f0dcc8;--tx2:#b09880;--tx3:#6e5a48;--acc:#e87030;--acc2:#d06028;--accd:rgba(232,112,48,.12);--tl:#50b888;--tld:rgba(80,184,136,.12);--rd:#d84848;--gn:#60a860;--bd:#3e3028;--r:8px;--sh:0 2px 12px rgba(0,0,0,.5);--f-ed:'Vollkorn',Georgia,serif;--f-ui:'DM Sans','Outfit',sans-serif;--f-mo:'Source Code Pro','JetBrains Mono',monospace}
+html{font-family:var(--f-ui);background:var(--bg0);color:var(--tx);font-size:16px;-webkit-text-size-adjust:100%}
+body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+button{font-family:var(--f-ui);cursor:pointer;border:none;background:none;color:var(--tx);font-size:.85rem}
+input,select,textarea{font-family:var(--f-ui);font-size:16px;color:var(--tx);background:var(--bg1);border:1px solid var(--bd);border-radius:var(--r);padding:6px 10px}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239a90b0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg1)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+#hdr{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--bg1);border-bottom:1px solid var(--bd);flex-shrink:0;z-index:20;flex-wrap:wrap}
+.logo{font-family:var(--f-ed);font-size:1.25rem;font-weight:700;color:var(--acc);white-space:nowrap;letter-spacing:-.02em}.logo span{color:var(--tl);font-weight:400}
+#modeSelect{min-width:150px}
+.hdr-btns{display:flex;gap:4px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.hdr-btns button{padding:6px 10px;border-radius:var(--r);transition:background .15s}.hdr-btns button:hover{background:var(--bg3)}.hdr-btns button.active{background:var(--accd);color:var(--acc)}
+#main{display:flex;flex:1;overflow:hidden;position:relative}
+#panel{width:300px;flex-shrink:0;background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;transition:transform .25s ease,opacity .2s;z-index:15}
+#panel.hidden{transform:translateX(-100%);opacity:0;position:absolute;top:0;bottom:0;pointer-events:none}
+.ptabs{display:flex;border-bottom:1px solid var(--bd);background:var(--bg2);flex-shrink:0}
+.ptab{flex:1;padding:8px 2px;text-align:center;font-size:.65rem;color:var(--tx3);border-bottom:2px solid transparent;transition:all .15s;cursor:pointer;letter-spacing:.02em}
+.ptab:hover{color:var(--tx2)}.ptab.active{color:var(--acc);border-bottom-color:var(--acc)}.ptab i{display:block;font-size:.95rem;margin-bottom:2px}
+.pbody{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.ptab-content{display:none}.ptab-content.active{display:flex;flex-direction:column;gap:10px}
+.pfoot{padding:8px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pfoot-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);font-weight:600}
+.theme-dots{display:flex;gap:5px;align-items:center}
+.theme-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.theme-dot:hover{transform:scale(1.15)}.theme-dot.active{border-color:var(--tx);box-shadow:0 0 0 2px var(--bg0)}
+.theme-dot[data-theme="parchment"]{background:linear-gradient(135deg,#f7f3e8,#b86830)}.theme-dot[data-theme="twilight"]{background:linear-gradient(135deg,#16131e,#e8a848)}.theme-dot[data-theme="ember"]{background:linear-gradient(135deg,#1c1614,#e87030)}
+.ps{display:flex;flex-direction:column;gap:8px}.ps h4{font-size:.8rem;color:var(--tx2);font-weight:500}.ps label{font-size:.82rem;color:var(--tx2)}
+#center{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#toolbar{display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--bg2);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+#toolbar button{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:.82rem;transition:background .15s}
+#toolbar button:hover{background:var(--bg3)}#toolbar .sep{width:1px;height:20px;background:var(--bd);margin:0 3px}
+#toolbar select{font-size:.72rem;padding:3px 6px}
+#rhymeSuggest{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg2);border-bottom:1px solid var(--bd);min-height:38px;overflow:hidden}
+#rhymeSuggest .rs-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);font-weight:600;white-space:nowrap;flex-shrink:0}
+#rhymeSuggest .rs-word{font-size:.78rem;color:var(--acc);font-family:var(--f-ed);font-weight:600;white-space:nowrap;flex-shrink:0}
+#rsChips{display:flex;gap:5px;overflow-x:auto;flex:1;padding:2px 0;scrollbar-width:none}#rsChips::-webkit-scrollbar{display:none}
+#rsChips .rhyme-chip{animation:chipIn .25s ease both}
+@keyframes chipIn{from{opacity:0;transform:translateY(4px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+#edWrap{flex:1;overflow-y:auto;padding:20px 24px;background:var(--ed)}
+#editor{min-height:200px;outline:none;font-family:var(--f-ed);font-size:1.15rem;line-height:1.75;color:var(--tx);white-space:pre-wrap;word-wrap:break-word;caret-color:var(--acc)}
+#editor:empty::before{content:attr(data-placeholder);color:var(--tx3);pointer-events:none;font-style:italic}
+#editor ul,#editor ol{margin:4px 0 4px 24px}#editor li{margin:2px 0}
+#editor table{border-collapse:collapse;width:100%;margin:8px 0}#editor td,#editor th{border:1px solid var(--bd);padding:6px 8px;min-width:40px;vertical-align:top}
+#editor img{max-width:100%;height:auto;border-radius:4px;margin:8px 0;display:block}
+#statusBar{display:flex;align-items:center;gap:14px;padding:6px 14px;background:var(--bg2);border-top:1px solid var(--bd);font-size:.75rem;color:var(--tx2);font-family:var(--f-mo);flex-wrap:wrap}
+.stat-val{color:var(--acc);font-weight:500}
+#collabBar{display:none;align-items:center;gap:10px;padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--bd);font-size:.82rem}
+#collabBar.active{display:flex;flex-wrap:wrap}
+.turn-indicator{padding:4px 10px;border-radius:20px;font-weight:600;font-size:.78rem}.turn-indicator.p1{background:rgba(232,168,72,.2);color:var(--acc)}.turn-indicator.p2{background:rgba(88,200,160,.2);color:var(--tl)}
+.timer-display{font-family:var(--f-mo);font-size:1.1rem;font-weight:700;min-width:55px;text-align:center;transition:color .2s}
+.timer-display.urgent{color:var(--rd);animation:timerPulse .5s ease infinite alternate}
+@keyframes timerPulse{from{opacity:1;transform:scale(1)}to{opacity:.7;transform:scale(1.08)}}
+.score-display{margin-left:auto;display:flex;gap:16px;font-family:var(--f-mo);font-size:.82rem}.score-p1{color:var(--acc)}.score-p2{color:var(--tl)}
+#structGuide{display:none;padding:6px 14px;background:var(--bg2);border-bottom:1px solid var(--bd);font-size:.8rem;color:var(--tx2)}
+#structGuide.active{display:block}.struct-label{color:var(--acc);font-weight:600;margin-right:6px}
+#bumper{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:var(--bg1);border-top:1px solid var(--bd);flex-shrink:0;min-height:48px}
+#bumper.hidden{display:none}
+.drum-controls{display:flex;align-items:center;gap:6px}
+.drum-controls button{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.drum-controls button:hover{background:var(--bg3)}.drum-controls button.playing{color:var(--acc);background:var(--accd)}
+.bpm-ctrl{display:flex;align-items:center;gap:4px}.bpm-ctrl input[type=range]{width:60px;accent-color:var(--acc)}.bpm-val{font-family:var(--f-mo);font-size:.72rem;min-width:36px;color:var(--acc)}
+.rhyme-chip{padding:5px 12px;border-radius:20px;background:var(--bg3);border:1px solid var(--bd);font-size:.8rem;white-space:nowrap;cursor:pointer;transition:all .15s;font-family:var(--f-ed)}
+.rhyme-chip:hover{background:var(--accd);border-color:var(--acc);color:var(--acc)}.rhyme-chip.phonetic{border-color:var(--tl);color:var(--tl)}.rhyme-chip.generated{border-style:dashed;color:var(--tx3)}.rhyme-chip.slang{border-color:var(--acc);color:var(--acc);font-style:italic}
+.phonetic-display{font-family:var(--f-mo);font-size:.78rem;padding:6px 10px;background:var(--bg3);border-radius:var(--r);color:var(--tl);word-break:break-all}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.82rem}.metric-label{color:var(--tx2)}.metric-value{font-family:var(--f-mo);color:var(--acc);font-weight:500}
+.meter-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:4px}.meter-fill{height:100%;border-radius:2px;transition:width .3s}.meter-fill.gold{background:var(--acc)}.meter-fill.teal{background:var(--tl)}
+.freq-grid{display:flex;flex-wrap:wrap;gap:4px}.freq-word{font-size:.72rem;padding:2px 6px;border-radius:3px;font-family:var(--f-mo)}
+#promptBubble{display:none;position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:8px 14px;font-size:.82rem;color:var(--tx2);box-shadow:var(--sh);z-index:10;max-width:300px;text-align:center;animation:fadeUp .3s ease}
+#promptBubble.show{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+#storyStatus{display:none;padding:4px 14px;background:var(--bg3);font-size:.78rem;color:var(--tx2);border-bottom:1px solid var(--bd)}
+#storyStatus.active{display:flex;align-items:center;gap:8px}.story-progress{flex:1;height:3px;background:var(--bg1);border-radius:2px;overflow:hidden}.story-fill{height:100%;background:var(--tl);transition:width .3s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .15s}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:24px;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.modal h3{font-family:var(--f-ed);font-size:1.15rem;margin-bottom:12px}.modal p{font-size:.9rem;color:var(--tx2);margin-bottom:16px;line-height:1.5}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:8px 16px;border-radius:var(--r);font-weight:500;transition:all .15s}
+.btn-primary{background:var(--acc);color:#111}.btn-primary:hover{background:var(--acc2)}.btn-ghost{background:var(--bg3);color:var(--tx2)}.btn-ghost:hover{background:var(--bd)}.btn-danger{background:var(--rd);color:#fff}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.coin{width:60px;height:60px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#111;margin:16px auto;font-family:var(--f-ed)}
+.coin.flipping{animation:coinFlip .8s ease}@keyframes coinFlip{0%{transform:rotateY(0)}50%{transform:rotateY(900deg)}100%{transform:rotateY(1800deg)}}
+.qr-box{background:var(--bg3);border-radius:var(--r);padding:16px;text-align:center;margin:8px 0}.qr-box svg{max-width:180px;max-height:180px;display:block;margin:0 auto}
+.room-code{font-family:var(--f-mo);font-size:1.5rem;font-weight:700;color:var(--acc);letter-spacing:.15em;text-align:center;padding:8px;background:var(--bg3);border-radius:var(--r);margin:6px 0}
+.share-btn{width:100%;padding:10px;border-radius:var(--r);font-weight:500;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;border:1px solid var(--bd);background:var(--bg3);color:var(--tx)}.share-btn:hover{border-color:var(--acc);color:var(--acc)}
+.share-btn.copied{background:var(--gn);color:#fff;border-color:var(--gn)}
+@media(max-width:900px){#panel{position:absolute;top:0;bottom:0;z-index:15;width:280px}#panel.hidden{display:none}}
+@media(max-width:600px){#hdr{padding:6px 10px;gap:6px}.logo{font-size:1rem}#modeSelect{min-width:120px;font-size:.82rem}#edWrap{padding:12px 14px}#editor{font-size:1.05rem}.ptab{font-size:.6rem;padding:6px 2px}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <div class="logo">Verse<span>Engine</span></div>
+  <select id="modeSelect" aria-label="Writing mode">
+    <option value="freeform">Freeform Poetry</option>
+    <option value="battle">Battle / Duel</option>
+    <option value="horse">Follow the Leader</option>
+    <option value="callresponse">Call &amp; Response</option>
+    <option value="story">Story Mode</option>
+    <option value="structure">Structure Mode</option>
+    <option value="harmonic">Harmonic Progression</option>
+    <option value="analysis">Analysis Mode</option>
+    <option value="dictation">Dictation Mode</option>
+    <option value="performance">Performance Mode</option>
+  </select>
+  <div class="hdr-btns">
+    <button id="btnMenu" title="Menu"><i class="fas fa-bars"></i></button>
+    <button id="btnPhonetic" title="Toggle Phonetic"><i class="fas fa-language"></i></button>
+    <button id="btnDictation" title="Dictation"><i class="fas fa-microphone"></i></button>
+    <button id="btnExport" title="Export"><i class="fas fa-download"></i></button>
+    <button id="btnImport" title="Import"><i class="fas fa-upload"></i></button>
+    <input type="file" id="importFile" accept=".json,.csv" class="sr-only">
+  </div>
+</header>
+<div id="main">
+  <aside id="panel" class="hidden">
+    <div class="ptabs">
+      <div class="ptab active" data-ptab="pFormat"><i class="fas fa-pen-fancy"></i>Format</div>
+      <div class="ptab" data-ptab="pTools"><i class="fas fa-wrench"></i>Tools</div>
+      <div class="ptab" data-ptab="pBattle"><i class="fas fa-users"></i>Battle</div>
+      <div class="ptab" data-ptab="pStats"><i class="fas fa-chart-bar"></i>Stats</div>
+      <div class="ptab" data-ptab="pShare"><i class="fas fa-share-alt"></i>Share</div>
+    </div>
+    <div class="pbody">
+      <!-- FORMAT TAB -->
+      <div id="pFormat" class="ptab-content active">
+        <div class="ps"><h4>Font Family</h4>
+          <select id="fontSelect" style="width:100%" aria-label="Font">
+            <optgroup label="Serif">
+              <option value="'Vollkorn',serif">Vollkorn</option>
+              <option value="'Lora',serif">Lora</option>
+              <option value="'Merriweather',serif">Merriweather</option>
+              <option value="'Playfair Display',serif">Playfair Display</option>
+              <option value="'Crimson Text',serif">Crimson Text</option>
+              <option value="'Libre Baskerville',serif">Libre Baskerville</option>
+              <option value="'Bitter',serif">Bitter</option>
+              <option value="'Cormorant Garamond',serif">Cormorant Garamond</option>
+              <option value="'EB Garamond',serif">EB Garamond</option>
+              <option value="'Spectral',serif">Spectral</option>
+              <option value="Georgia,serif">Georgia</option>
+            </optgroup>
+            <optgroup label="Sans / Display">
+              <option value="'DM Sans',sans-serif">DM Sans</option>
+              <option value="'Outfit',sans-serif">Outfit</option>
+              <option value="'Josefin Sans',sans-serif">Josefin Sans</option>
+              <option value="'Caveat',cursive">Caveat</option>
+              <option value="'Abril Fatface',serif">Abril Fatface</option>
+            </optgroup>
+            <optgroup label="Monospace">
+              <option value="'JetBrains Mono',monospace">JetBrains Mono</option>
+              <option value="'Source Code Pro',monospace">Source Code Pro</option>
+              <option value="'IBM Plex Mono',monospace">IBM Plex Mono</option>
+              <option value="'Fira Code',monospace">Fira Code</option>
+              <option value="'Space Mono',monospace">Space Mono</option>
+              <option value="'Courier New',monospace">Courier New</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="ps"><h4>Font Size</h4>
+          <select id="sizeSelect" style="width:100%" aria-label="Font size">
+            <option value="0.75rem">12px</option><option value="0.875rem">14px</option>
+            <option value="1rem">16px</option><option value="1.15rem" selected>18px</option>
+            <option value="1.25rem">20px</option><option value="1.5rem">24px</option>
+            <option value="1.75rem">28px</option><option value="2rem">32px</option>
+            <option value="2.25rem">36px</option><option value="2.625rem">42px</option>
+            <option value="3rem">48px</option>
+          </select>
+        </div>
+        <div class="ps"><h4>Insert</h4>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-ghost" id="btnInsertImage" style="flex:1;min-width:120px"><i class="fas fa-image"></i> Image</button>
+            <button class="btn btn-ghost" id="btnInsertTable" style="flex:1;min-width:120px"><i class="fas fa-table"></i> Table</button>
+          </div>
+        </div>
+        <div class="ps"><h4>Playback</h4>
+          <select id="playbackMode" style="width:100%" aria-label="Playback mode">
+            <option value="natural">Natural TTS</option><option value="wordbeat">Word-per-Beat</option>
+            <option value="linebar">Line-per-Bar</option><option value="syllable">Syllable Pulse</option>
+          </select>
+        </div>
+      </div>
+      <!-- TOOLS TAB -->
+      <div id="pTools" class="ptab-content">
+        <div class="ps"><h4>Phonetic Display</h4>
+          <select id="phoneticMode" aria-label="Phonetic mode"><option value="ipa">IPA</option><option value="arpa">ARPAbet</option><option value="xsampa">X-SAMPA</option><option value="easy">EasyRead</option></select>
+          <div id="phoneticOut" class="phonetic-display">Type to see phonetics...</div>
+          <h4>Rime Extraction</h4><div id="rimeOut" class="phonetic-display" style="color:var(--acc)">—</div>
+        </div>
+        <div class="ps"><h4>Poetic Form</h4>
+          <select id="formSelect" aria-label="Poetic form">
+            <option value="free">Free Verse</option><option value="abab">ABAB</option><option value="aabb">AABB</option>
+            <option value="chiastic">Chiastic</option><option value="spiral">Spiral</option><option value="sonnet">Sonnet</option>
+            <option value="villanelle">Villanelle</option><option value="blues">Blues AAB</option><option value="quatrain">Quatrain</option>
+            <option value="haiku">Haiku (5-7-5)</option><option value="iambic">Iambic</option>
+          </select>
+          <div id="formGuide" style="font-size:.82rem;color:var(--tx2);line-height:1.5"></div>
+        </div>
+        <div class="ps"><h4>Flow Assist</h4><div id="promptCategories" style="display:flex;flex-direction:column;gap:6px"></div></div>
+      </div>
+      <!-- BATTLE TAB -->
+      <div id="pBattle" class="ptab-content">
+        <div class="ps"><h4>Collaboration Setup</h4>
+          <label>Player 1</label><input id="p1Name" type="text" value="Player 1">
+          <label>Player 2</label><input id="p2Name" type="text" value="Player 2">
+          <label>Turn Time (seconds)</label><input id="turnTime" type="number" value="60" min="10" max="600">
+          <label style="font-size:.78rem;color:var(--tx3);display:flex;align-items:center;gap:6px"><input type="checkbox" id="tickSound" checked> Timer tick sound</label>
+          <button class="btn btn-primary" id="btnStartCollab">Start Collaboration</button>
+          <button class="btn btn-ghost" id="btnCoinFlip">Coin Flip for First Turn</button>
+          <button class="btn btn-danger" id="btnEndCollab" style="display:none">End Collaboration</button>
+        </div>
+        <div class="ps"><h4>Story Trigger</h4>
+          <select id="storyTrigger" aria-label="Story trigger"><option value="timed">Timed</option><option value="stopword">Stop Word</option><option value="stopsentence">Stop Sentence</option><option value="fate">Fate Stop</option></select>
+          <div id="storyConfig"></div>
+          <button class="btn btn-primary" id="btnStartStory">Start Story Mode</button>
+          <button class="btn btn-danger" id="btnEndStory" style="display:none">End Story</button>
+        </div>
+      </div>
+      <!-- STATS TAB -->
+      <div id="pStats" class="ptab-content">
+        <div class="ps"><h4>Metrics</h4>
+          <div class="metric-row"><span class="metric-label">Rhyme Density</span><span class="metric-value" id="mRhymeDens">0%</span></div>
+          <div class="meter-bar"><div class="meter-fill gold" id="mRhymeDensBar" style="width:0%"></div></div>
+          <div class="metric-row"><span class="metric-label">Internal Rhymes</span><span class="metric-value" id="mIntRhymes">0</span></div>
+          <div class="metric-row"><span class="metric-label">Lexical Diversity</span><span class="metric-value" id="mShannon">0.00</span></div>
+          <div class="meter-bar"><div class="meter-fill teal" id="mShannonBar" style="width:0%"></div></div>
+          <div class="metric-row"><span class="metric-label">Avg Syll/Line</span><span class="metric-value" id="mAvgSyll">0</span></div>
+          <div class="metric-row"><span class="metric-label">Unique Words</span><span class="metric-value" id="mUnique">0</span></div>
+          <div class="metric-row"><span class="metric-label">Scrabble Score</span><span class="metric-value" id="mScrabble">0</span></div>
+        </div>
+        <div class="ps"><h4>Rhyme Pairs</h4><div id="rhymePairs" style="font-size:.82rem;color:var(--tx2);max-height:200px;overflow-y:auto"></div></div>
+        <div class="ps"><h4>Top Words</h4><div id="wordFreq" class="freq-grid"></div></div>
+        <div class="ps"><h4>Top Bigrams</h4><div id="bigramFreq" class="freq-grid"></div></div>
+        <div class="ps"><h4>Thematic Words</h4><div id="thematicWords" style="font-size:.82rem;color:var(--tx2)"></div></div>
+        <div class="ps"><h4>Narrative Arc</h4>
+          <div id="arcDisplay" style="font-size:.82rem;color:var(--tx2);line-height:1.5"></div>
+          <div style="display:flex;gap:4px;margin-top:6px">
+            <div style="flex:1;text-align:center;padding:5px;border-radius:4px;font-size:.68rem" id="arc1">I</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:4px;font-size:.68rem" id="arc2">IV</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:4px;font-size:.68rem" id="arc3">V</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:4px;font-size:.68rem" id="arc4">I</div>
+          </div>
+        </div>
+      </div>
+      <!-- SHARE TAB -->
+      <div id="pShare" class="ptab-content">
+        <div class="ps"><h4>Room</h4>
+          <button class="btn btn-primary" id="btnCreateRoom" style="width:100%"><i class="fas fa-door-open"></i> Create Room</button>
+          <div id="roomDisplay" style="display:none">
+            <div class="room-code" id="roomCode"></div>
+            <div class="qr-box" id="qrBox"></div>
+          </div>
+        </div>
+        <div class="ps"><h4>Invite</h4>
+          <button class="share-btn" id="btnCopyLink"><i class="fas fa-link"></i> Copy Room Link</button>
+          <button class="share-btn" id="btnTextInvite"><i class="fas fa-sms"></i> Copy Text Invite</button>
+        </div>
+        <div class="ps"><h4>Join Session</h4>
+          <textarea id="joinData" rows="3" placeholder="Paste shared session data here..." style="width:100%;font-size:14px;resize:vertical"></textarea>
+          <button class="btn btn-ghost" id="btnJoinRoom" style="width:100%"><i class="fas fa-sign-in-alt"></i> Import Shared Data</button>
+        </div>
+      </div>
+    </div>
+    <div class="pfoot">
+      <span class="pfoot-label">Theme</span>
+      <div class="theme-dots">
+        <div class="theme-dot active" data-theme="parchment" title="Parchment"></div>
+        <div class="theme-dot" data-theme="twilight" title="Twilight"></div>
+        <div class="theme-dot" data-theme="ember" title="Ember"></div>
+      </div>
+    </div>
+  </aside>
+  <section id="center">
+    <div id="collabBar">
+      <span class="turn-indicator p1" id="turnLabel">Player 1's Turn</span>
+      <div class="timer-display" id="turnTimer">1:00</div>
+      <button class="btn btn-ghost" id="btnSwitchTurn" style="font-size:.78rem"><i class="fas fa-exchange-alt"></i> Switch</button>
+      <div class="score-display"><span class="score-p1" id="scoreP1">P1: 0</span><span class="score-p2" id="scoreP2">P2: 0</span></div>
+    </div>
+    <div id="structGuide"><span class="struct-label">Next:</span><span id="structHint">—</span></div>
+    <div id="storyStatus"><i class="fas fa-book-open" style="color:var(--tl)"></i><span id="storyLabel">Story active...</span><div class="story-progress"><div class="story-fill" id="storyFill" style="width:0%"></div></div></div>
+    <div id="toolbar">
+      <button title="Bold" data-cmd="bold"><i class="fas fa-bold"></i></button>
+      <button title="Italic" data-cmd="italic"><i class="fas fa-italic"></i></button>
+      <button title="Underline" data-cmd="underline"><i class="fas fa-underline"></i></button>
+      <div class="sep"></div>
+      <button title="Bullet List" id="btnUL"><i class="fas fa-list-ul"></i></button>
+      <button title="Numbered List" id="btnOL"><i class="fas fa-list-ol"></i></button>
+      <div class="sep"></div>
+      <button title="Insert Image" id="btnImgTB"><i class="fas fa-image"></i></button>
+      <button title="Insert Table" id="btnTblTB"><i class="fas fa-table"></i></button>
+      <div class="sep"></div>
+      <button title="Clear Formatting" id="btnClearFmt"><i class="fas fa-eraser"></i></button>
+      <button title="Play/Stop" id="btnPlayback"><i class="fas fa-play"></i></button>
+    </div>
+    <div id="rhymeSuggest">
+      <span class="rs-label">Rhymes</span>
+      <span class="rs-word" id="rsWord"></span>
+      <div id="rsChips"><span style="color:var(--tx3);font-size:.78rem;padding:4px">Type to see rhyme suggestions...</span></div>
+    </div>
+    <div id="edWrap"><div id="editor" contenteditable="true" data-placeholder="Begin writing... let the rhythm find you." spellcheck="true" role="textbox" aria-multiline="true"></div></div>
+    <div id="statusBar">
+      <span>Chars: <span class="stat-val" id="charCount">0</span></span>
+      <span>Words: <span class="stat-val" id="wordCount">0</span></span>
+      <span>Syll: <span class="stat-val" id="syllCount">0</span></span>
+      <span>Lines: <span class="stat-val" id="lineCount">0</span></span>
+      <span id="modeLabel" style="margin-left:auto;color:var(--tl)">Freeform Poetry</span>
+    </div>
+    <div id="promptBubble"><span id="promptText"></span> <button style="margin-left:8px;color:var(--acc);font-size:.78rem" id="btnInsertPrompt">Insert</button> <button style="color:var(--tx3);font-size:.72rem" id="btnDismissPrompt">&#10005;</button></div>
+  </section>
+</div>
+<footer id="bumper">
+  <div class="drum-controls">
+    <button id="btnDrum" title="Drums"><i class="fas fa-drum"></i></button>
+    <select id="drumPattern" style="font-size:.72rem;padding:2px 4px;width:80px" aria-label="Drum pattern"><option value="boombap">Boom Bap</option><option value="lofi">Lo-Fi</option><option value="metro">Metronome</option></select>
+    <div class="bpm-ctrl"><input type="range" id="bpmSlider" min="40" max="200" value="90" aria-label="BPM"><span class="bpm-val" id="bpmVal">90</span></div>
+  </div>
+</footer>
+<script>
+/* ====== THEME ====== */
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelectorAll('.theme-dot').forEach(function(d){d.classList.toggle('active',d.dataset.theme===t)})}
+if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){setTheme('twilight')}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(e){setTheme(e.matches?'twilight':'parchment')});
+document.querySelectorAll('.theme-dot').forEach(function(d){d.addEventListener('click',function(){setTheme(d.dataset.theme)})});
+
+/* ====== STATE ====== */
+var S={mode:'freeform',text:'',lines:[],lastWord:'',
+  phonetic:{enabled:false,display:'ipa'},structure:{form:'free'},
+  collab:{active:false,turn:0,p1:'Player 1',p2:'Player 2',time:60,timer:null,remaining:[60,60],scores:[0,0]},
+  story:{active:false,trigger:'timed',value:'',timer:null,fateWord:'',startTime:0},
+  drum:{playing:false,bpm:90,pattern:'boombap'},
+  dictation:{active:false,recognition:null,wasDrumPlaying:false},
+  playback:{playing:false,mode:'natural',utterance:null,timer:null},
+  prompt:{timer:null,lastType:Date.now(),showing:false},
+  room:{code:'',active:false}
+};
+
+/* ====== UTILITY ====== */
+var $=function(id){return document.getElementById(id)};
+var debounce=function(fn,ms){var t;return function(){var a=arguments;clearTimeout(t);t=setTimeout(function(){fn.apply(null,a)},ms)}};
+function getEditorText(){return ($('editor').innerText||'').replace(/\u00A0/g,' ')}
+function getLines(){return getEditorText().split('\n').filter(function(l){return l.trim()})}
+function lastWordFn(text){var w=text.trim().split(/\s+/);return w.length?w[w.length-1].replace(/[^a-zA-Z'-]/g,'').toLowerCase():''}
+function showModal(title,msg,actions){
+  var ov=document.createElement('div');ov.className='modal-overlay';
+  ov.innerHTML='<div class="modal"><h3>'+title+'</h3><p>'+msg+'</p><div class="modal-actions">'+actions.map(function(a){return '<button class="btn '+(a.cls||'btn-ghost')+'" data-act="'+a.id+'">'+a.label+'</button>'}).join('')+'</div></div>';
+  document.body.appendChild(ov);
+  ov.querySelectorAll('[data-act]').forEach(function(b){b.addEventListener('click',function(){var a=actions.find(function(x){return x.id===b.dataset.act});if(a&&a.fn)a.fn();ov.remove()})});
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()});
+}
+function showFormModal(title,fields,onSubmit){
+  var ov=document.createElement('div');ov.className='modal-overlay';
+  var html='<div class="modal"><h3>'+title+'</h3>';
+  fields.forEach(function(f){html+='<label style="display:block;font-size:.82rem;color:var(--tx2);margin-bottom:2px">'+f.label+'</label><input id="fm_'+f.id+'" type="'+(f.type||'text')+'" placeholder="'+(f.placeholder||'')+'" value="'+(f.value||'')+'" style="width:100%;margin-bottom:10px;font-size:16px">'});
+  html+='<div class="modal-actions"><button class="btn btn-ghost" data-act="cancel">Cancel</button><button class="btn btn-primary" data-act="ok">Insert</button></div></div>';
+  ov.innerHTML=html;document.body.appendChild(ov);
+  ov.querySelector('[data-act="cancel"]').addEventListener('click',function(){ov.remove()});
+  ov.querySelector('[data-act="ok"]').addEventListener('click',function(){var vals={};fields.forEach(function(f){vals[f.id]=ov.querySelector('#fm_'+f.id).value});ov.remove();onSubmit(vals)});
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()});
+  var first=ov.querySelector('input');if(first)first.focus();
+}
+
+/* ====== SYLLABLE ====== */
+function countSyllables(word){
+  word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return 0;if(word.length<=3)return 1;
+  var exc={area:3,idea:3,real:2,poem:2,poet:2,cruel:2,fire:2,hour:2,fuel:2,being:2,doing:2,going:2,lion:2,riot:2,quiet:3,science:2,every:3,different:3,evening:3,interest:3,chocolate:3,camera:3,family:3,favorite:3,beautiful:4,comfortable:4,vegetable:4,literature:4};
+  if(exc[word])return exc[word];word=word.replace(/(?:[^leas])e$/,'');var m=word.match(/[aeiouy]+/g);var c=m?m.length:1;if(word.match(/tion$/))c=Math.max(1,c);if(word.match(/[^aeiou]le$/))c++;return Math.max(1,c);
+}
+function totalSyllables(text){return text.split(/\s+/).filter(Boolean).reduce(function(a,w){return a+countSyllables(w)},0)}
+
+/* ====== PHONETIC ENGINE ====== */
+var Phonetic=(function(){
+  var vowelIPA={a:'æ',e:'ɛ',i:'ɪ',o:'ɒ',u:'ʌ',ai:'aɪ',ay:'eɪ',ea:'iː',ee:'iː',ei:'eɪ',ey:'eɪ',ie:'iː',oa:'oʊ',oo:'uː',ou:'aʊ',ow:'aʊ',oi:'ɔɪ',oy:'ɔɪ',au:'ɔː',aw:'ɔː',ue:'uː',ew:'juː',igh:'aɪ',ight:'aɪt',ar:'ɑːr',er:'ɜːr',ir:'ɜːr',or:'ɔːr',ur:'ɜːr',are:'ɛr',ore:'ɔːr',ire:'aɪr',ure:'jʊr'};
+  var consIPA={b:'b',c:'k',d:'d',f:'f',g:'ɡ',h:'h',j:'dʒ',k:'k',l:'l',m:'m',n:'n',p:'p',r:'r',s:'s',t:'t',v:'v',w:'w',x:'ks',y:'j',z:'z',ch:'tʃ',sh:'ʃ',th:'θ',ph:'f',wh:'w',wr:'r',kn:'n',gn:'n',ng:'ŋ',nk:'ŋk',ck:'k',gh:'',qu:'kw',tch:'tʃ'};
+  var ipaToArpa={æ:'AE',ɛ:'EH',ɪ:'IH',ɒ:'AA',ʌ:'AH',aɪ:'AY',eɪ:'EY','iː':'IY',oʊ:'OW','uː':'UW',aʊ:'AW',ɔɪ:'OY','ɔː':'AO','juː':'UW','ɑːr':'AA R','ɜːr':'ER','ɔːr':'AO R',ɛr:'EH R',aɪr:'AY R','jʊr':'UH R',aɪt:'AY T',b:'B',d:'D',f:'F',ɡ:'G',h:'HH',dʒ:'JH',k:'K',l:'L',m:'M',n:'N',ŋ:'NG','ŋk':'NG K',p:'P',r:'R',s:'S',t:'T',v:'V',w:'W',ks:'K S',j:'Y',z:'Z','tʃ':'CH',ʃ:'SH',θ:'TH',ð:'DH'};
+  var ipaToXSampa={æ:'{',ɛ:'E',ɪ:'I',ɒ:'Q',ʌ:'V',aɪ:'aI',eɪ:'eI','iː':'i:',oʊ:'oU','uː':'u:',aʊ:'aU',ɔɪ:'OI','ɔː':'O:','juː':'ju:','ɑːr':'A: r','ɜːr':'3: r','ɔːr':'O: r',b:'b',d:'d',f:'f',ɡ:'g',h:'h',dʒ:'dZ',k:'k',l:'l',m:'m',n:'n',ŋ:'N',p:'p',r:'r',s:'s',t:'t',v:'v',w:'w',j:'j',z:'z','tʃ':'tS',ʃ:'S',θ:'T'};
+  function basicConvert(word){word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return '';var ipa='',i=0;while(i<word.length){var matched=false;for(var len=4;len>=2;len--){var chunk=word.substring(i,i+len);if(vowelIPA[chunk]){ipa+=vowelIPA[chunk];i+=len;matched=true;break}if(consIPA[chunk]!==undefined){ipa+=consIPA[chunk];i+=len;matched=true;break}}if(!matched){var ch=word[i];if(vowelIPA[ch])ipa+=vowelIPA[ch];else if(consIPA[ch]!==undefined)ipa+=consIPA[ch];else ipa+=ch;i++}}return ipa}
+  function toEasyRead(word){word=word.toLowerCase();var swaps=[['ight','ITE'],['tion','shun'],['sion','zhun'],['ph','f'],['th','th'],['sh','sh'],['ch','ch'],['ck','k'],['oo','oo'],['ee','ee'],['ea','ee'],['ou','ow'],['ow','ow'],['ai','ay'],['ey','ay'],['oi','oy']];var r=word;swaps.forEach(function(s){r=r.replace(new RegExp(s[0],'g'),s[1])});return r.toUpperCase()}
+  function convert(word,mode){if(!word)return '';var ipa=basicConvert(word);if(mode==='ipa')return '/'+ipa+'/';if(mode==='easy')return toEasyRead(word);var map=mode==='arpa'?ipaToArpa:ipaToXSampa;var result='',i=0;while(i<ipa.length){var matched=false;for(var len=3;len>=1;len--){var chunk=ipa.substring(i,i+len);if(map[chunk]!==undefined){result+=(result?' ':'')+map[chunk];i+=len;matched=true;break}}if(!matched){result+=ipa[i];i++}}return mode==='arpa'?result.toUpperCase():result}
+  function getRime(word){var ipa=basicConvert(word);var vowels='æɛɪɒʌaeiouɜɔː';var li=-1;for(var i=ipa.length-1;i>=0;i--){if(vowels.indexOf(ipa[i])!==-1){li=i;break}}if(li===-1)return ipa.slice(-2)||ipa;var start=li;while(start>0&&vowels.indexOf(ipa[start-1])!==-1)start--;return ipa.substring(start)}
+  return{convert:convert,getRime:getRime,basicConvert:basicConvert};
+})();
+
+/* ====== RHYME ENGINE ====== */
+var RhymeEngine=(function(){
+  var families={
+    'æk':['back','black','crack','hack','jack','lack','pack','rack','sack','stack','track','whack','attack','knack','snack','clack','mac','wack'],
+    'eɪl':['tail','mail','sail','rail','trail','fail','bail','hail','jail','nail','pale','sale','tale','wail','frail','snail','scale','grail','prevail','detail'],
+    'eɪn':['rain','brain','chain','drain','gain','grain','main','pain','plain','train','vain','strain','contain','explain','remain','lane','cane','insane','crane','plane','reign'],
+    'eɪk':['make','take','break','cake','fake','lake','sake','shake','snake','stake','wake','flake','mistake','quake','bake','rake','awake'],
+    'eɪm':['name','flame','game','blame','came','fame','frame','same','shame','tame','claim','aim','dame','lame','proclaim'],
+    'æŋk':['bank','blank','crank','drank','frank','plank','rank','sank','shank','spank','tank','thank','yank','prank'],
+    'æʃ':['crash','flash','dash','cash','clash','gash','hash','lash','mash','rash','slash','smash','splash','stash','trash','bash'],
+    'eɪt':['late','fate','gate','hate','mate','rate','state','wait','create','date','debate','great','plate','straight','weight','skate','celebrate'],
+    'ɔː':['raw','law','draw','claw','flaw','jaw','paw','saw','straw','thaw','awe'],
+    'eɪ':['day','play','say','way','bay','clay','gray','hay','lay','may','pay','pray','ray','stay','sway','spray','delay','away','okay','betray'],
+    'iːl':['real','deal','feel','heal','meal','peel','seal','steal','wheel','zeal','reveal','appeal','ideal','kneel','steel'],
+    'iːn':['clean','mean','lean','green','seen','keen','queen','screen','between','machine','scene','bean','teen','serene'],
+    'iːt':['beat','heat','treat','eat','feat','meat','neat','seat','sweet','cheat','complete','defeat','repeat','street','wheat','greet','fleet','elite'],
+    'iːd':['need','seed','speed','feed','lead','read','breed','creed','deed','freed','greed','weed','bleed','proceed','succeed','indeed'],
+    'ɛl':['tell','shell','spell','bell','cell','dwell','fell','hell','sell','smell','swell','well','yell','compel','excel','farewell'],
+    'ɛst':['best','rest','quest','chest','guest','nest','test','west','zest','blessed','impressed','invest','protest','request'],
+    'ɪk':['quick','thick','trick','brick','click','flick','kick','lick','pick','sick','slick','stick','wick','magic','music'],
+    'aɪd':['ride','pride','wide','bride','guide','hide','side','slide','stride','tide','decide','divide','inside','outside','provide'],
+    'aɪt':['light','night','fight','bright','flight','height','might','right','sight','tight','white','write','delight','ignite','knight','bite','kite','quite','unite','tonight','moonlight'],
+    'ɪl':['still','skill','thrill','bill','chill','drill','fill','grill','hill','kill','mill','pill','spill','will','until','fulfill'],
+    'aɪn':['line','fine','divine','mine','nine','pine','shine','sign','vine','wine','combine','define','design','decline','outline','refine','sunshine','intertwine'],
+    'ɪŋ':['ring','king','thing','bring','cling','fling','sing','spring','sting','string','swing','wing','zing','anything','everything','nothing','bling'],
+    'ɪŋk':['think','drink','link','blink','brink','ink','mink','pink','rink','shrink','sink','stink','wink','zinc'],
+    'ɒk':['rock','block','shock','clock','dock','flock','knock','lock','mock','sock','stock','walk','talk','chalk','hawk'],
+    'oʊk':['broke','spoke','woke','choke','joke','poke','smoke','stroke','cloak','folk','oak','bloke','evoke','invoke'],
+    'ʊd':['good','wood','stood','could','would','should','hood','book','cook','hook','look','took','shook','brook'],
+    'uːl':['cool','fool','pool','tool','rule','cruel','drool','school','spool','stool','overrule'],
+    'uːm':['room','bloom','doom','gloom','groom','zoom','boom','broom','loom','plume','fume','assume','consume'],
+    'ɔːr':['more','score','explore','before','core','door','floor','four','pour','shore','store','bore','ignore','restore','adore'],
+    'aʊnd':['sound','ground','found','around','bound','down','drown','frown','hound','mound','pound','round','town','wound','profound','surround'],
+    'oʊ':['flow','show','grow','blow','glow','know','low','row','slow','snow','throw','below','follow','shadow','window','yellow'],
+    'ʌk':['luck','duck','truck','buck','chuck','muck','pluck','stuck','struck','tuck','starstruck'],
+    'ʌst':['just','must','trust','bust','dust','gust','crust','rust','adjust','disgust','robust','thrust'],
+    'iː':['free','tree','three','agree','bee','degree','fee','key','knee','sea','see','she','tea','we','guarantee'],
+    'ɜːr':['word','bird','heard','third','blur','fur','her','sir','stir','were','occur','prefer','refer','absurd'],
+    'ɪr':['clear','dear','fear','hear','near','tear','year','appear','career','engineer','sincere','severe'],
+    'aɪr':['fire','wire','hire','tire','desire','inspire','require','admire','aspire','entire','expire','empire','retire'],
+    'æp':['cap','trap','snap','clap','wrap','strap','dap','nap','map','gap','tap','rap','flap','slap','zap','scrap'],
+    'ɪt':['lit','hit','bit','fit','kit','spit','grit','wit','legit','submit','admit','skit','knit','split','quit'],
+    'ɪp':['drip','trip','flip','grip','hip','lip','rip','ship','skip','slip','strip','tip','whip','chip','clip','dip','zip'],
+    'ʌn':['fun','run','gun','sun','done','ton','won','stun','bun','pun','spun','none','outrun','begun'],
+    'æd':['bad','dad','glad','had','mad','sad','pad','rad','chad','lad','fad','add','nomad'],
+    'ɒt':['hot','got','shot','lot','not','pot','rot','spot','dot','knot','trot','slot','blot','plot','forgot'],
+    'æt':['hat','cat','bat','fat','flat','mat','rat','sat','chat','that','brat','splat','stat','pat'],
+    'ʌɡ':['bug','drug','hug','jug','mug','plug','rug','shrug','slug','snug','thug','tug','dug'],
+    'ɛd':['bed','dead','fed','head','led','red','said','shed','spread','thread','bread','dread','fled','shred'],
+    'aʊ':['now','how','bow','cow','plow','wow','vow','brow','allow','pow','endow','somehow'],
+    'iːp':['deep','keep','sleep','creep','sweep','steep','cheap','heap','leap','reap','weep','peep','sheep'],
+    'ɜːrl':['world','girl','pearl','curl','hurl','swirl','twirl','unfurl','whirl','earl'],
+    'aɪf':['life','knife','wife','strife','rife','wildlife','nightlife','afterlife'],
+    'oʊl':['soul','roll','control','role','goal','whole','bowl','coal','pole','stroll','toll','scroll','patrol'],
+    'eɪs':['face','place','space','race','grace','trace','chase','base','case','pace','embrace','replace','erase'],
+    'uːv':['move','groove','prove','smooth','approve','improve','remove','disapprove'],
+    'iːm':['dream','stream','team','cream','beam','gleam','scheme','scream','steam','theme','extreme','supreme'],
+    'ʌf':['tough','rough','stuff','enough','bluff','buff','cuff','fluff','gruff','huff','puff'],
+    'aɪnd':['mind','find','kind','blind','behind','bind','grind','remind','unwind','rewind','mankind'],
+    'oʊld':['cold','bold','gold','hold','old','sold','told','fold','mold','behold','unfold','manifold'],
+    'uː':['crew','true','blue','through','new','flew','drew','knew','grew','brew','stew','clue','glue','shoe','pursue'],
+    'eɪd':['paid','made','played','stayed','laid','grade','trade','shade','blade','fade','jade','raid','spade','wade','arcade','cascade','decade'],
+    'ɑːrz':['bars','cars','stars','mars','scars','jars','guitars','cigars','superstars'],
+    'oʊp':['dope','hope','rope','scope','slope','nope','cope','soap','envelope','telescope'],
+    'aɪz':['eyes','size','rise','wise','prize','lies','dies','ties','flies','guys','surprise','disguise','realize']
+  };
+  function getLastWordRime(word){return Phonetic.getRime(word)}
+  function findRhymes(word,limit){
+    limit=limit||20;var rime=getLastWordRime(word);var results=[];var wl=word.toLowerCase();
+    Object.keys(families).forEach(function(key){var words=families[key];if(rime.endsWith(key)||key.endsWith(rime.slice(-2))||rime===key){words.forEach(function(w){if(w!==wl&&results.indexOf(w)===-1)results.push(w)})}});
+    if(results.length<5){var ending=wl.slice(-3);Object.keys(families).forEach(function(k){families[k].forEach(function(w){if(w.endsWith(ending)&&w!==wl&&results.indexOf(w)===-1)results.push(w)})})}
+    if(results.length<5){var e2=wl.slice(-2);Object.keys(families).forEach(function(k){families[k].forEach(function(w){if(w.endsWith(e2)&&w!==wl&&results.indexOf(w)===-1)results.push(w)})})}
+    return results.slice(0,limit);
+  }
+  function doWordsRhyme(a,b){if(a===b)return false;var ra=getLastWordRime(a),rb=getLastWordRime(b);if(ra===rb)return true;if(ra.length>=2&&rb.length>=2&&ra.slice(-2)===rb.slice(-2))return true;if(a.length>=3&&b.length>=3&&a.slice(-3)===b.slice(-3))return true;return false}
+  function detectEndRhymes(lines){var pairs=[];var ends=lines.map(function(l){var w=l.trim().split(/\s+/);return w.length?w[w.length-1].replace(/[^a-zA-Z'-]/g,'').toLowerCase():''});for(var i=0;i<ends.length;i++){for(var j=i+1;j<ends.length;j++){if(ends[i]&&ends[j]&&doWordsRhyme(ends[i],ends[j]))pairs.push({a:ends[i],b:ends[j],lines:[i,j]})}}return pairs}
+  function detectInternalRhymes(lines){var count=0;lines.forEach(function(line){var words=line.trim().split(/\s+/).map(function(w){return w.replace(/[^a-zA-Z'-]/g,'').toLowerCase()}).filter(Boolean);for(var i=0;i<words.length;i++){for(var j=i+2;j<words.length;j++){if(doWordsRhyme(words[i],words[j]))count++}}});return count}
+  var consonants='b,c,d,f,g,h,j,k,l,m,n,p,r,s,t,v,w,y,z'.split(',');
+  var blends='bl,br,cl,cr,dr,fl,fr,gl,gr,pl,pr,sc,sk,sl,sm,sn,sp,st,str,sw,tr,tw,wr,ch,sh,th,wh'.split(',');
+  function generateAlphabetSweep(word,limit){limit=limit||12;var rime=word.length>2?word.slice(word.search(/[aeiou][^aeiou]*$/i)):word;var results=[];var allOnsets=consonants.concat(blends);for(var i=0;i<allOnsets.length&&results.length<limit;i++){var c=allOnsets[i]+rime;if(c!==word.toLowerCase()&&c.length>2)results.push(c)}return results.slice(0,limit)}
+  return{findRhymes:findRhymes,detectEndRhymes:detectEndRhymes,detectInternalRhymes:detectInternalRhymes,doWordsRhyme:doWordsRhyme,generateAlphabetSweep:generateAlphabetSweep,families:families};
+})();
+
+/* ====== STRUCTURE ENGINE ====== */
+var StructureEngine=(function(){
+  var forms={free:{name:'Free Verse',scheme:[],desc:'No restrictions. Write freely.'},abab:{name:'ABAB',scheme:['A','B','A','B'],desc:'Alternating rhyme.'},aabb:{name:'AABB',scheme:['A','A','B','B'],desc:'Couplet rhyme.'},chiastic:{name:'Chiastic',scheme:['A','B','A','B','C','B','A'],desc:'Mirror structure.'},spiral:{name:'Spiral',scheme:['A','B','C','A','B','C','D','C','C'],desc:'Expanding spiral.'},sonnet:{name:'Sonnet',scheme:['A','B','A','B','C','D','C','D','E','F','E','F','G','G'],desc:'14 lines: 3 quatrains + couplet.'},villanelle:{name:'Villanelle',scheme:['A1','b','A2','a','b','A1','a','b','A2','a','b','A1','a','b','A2','a','b','A1','A2'],desc:'19 lines with refrains.'},blues:{name:'Blues AAB',scheme:['A','A','B'],desc:'Stated, repeated, resolved.'},quatrain:{name:'Quatrain',scheme:['A','B','C','B'],desc:'Four-line, 2&4 rhyme.'},haiku:{name:'Haiku',scheme:['5','7','5'],desc:'5-7-5 syllables.'},iambic:{name:'Iambic',scheme:[],desc:'da-DUM ~10 syll/line.'}};
+  function getGuidance(form,lineIdx){var f=forms[form];if(!f||!f.scheme.length)return null;var pos=lineIdx%f.scheme.length;var label=f.scheme[pos];if(form==='haiku')return 'Line '+(pos+1)+': Target '+label+' syllables';return 'Line '+(lineIdx+1)+': Rhyme group "'+label+'"'}
+  return{forms:forms,getGuidance:getGuidance};
+})();
+
+/* ====== METRICS ENGINE ====== */
+var Metrics=(function(){
+  var ss={a:1,b:3,c:3,d:2,e:1,f:4,g:2,h:4,i:1,j:8,k:5,l:1,m:3,n:1,o:1,p:3,q:10,r:1,s:1,t:1,u:1,v:4,w:4,x:8,y:4,z:10};
+  function analyze(text){
+    var words=text.split(/\s+/).filter(Boolean);var cw=words.map(function(w){return w.replace(/[^a-zA-Z'-]/g,'').toLowerCase()}).filter(Boolean);var lines=text.split('\n').filter(function(l){return l.trim()});
+    var chars=text.length,wc=cw.length,syll=cw.reduce(function(a,w){return a+countSyllables(w)},0),lc=lines.length,uw=new Set(cw).size;
+    var rp=RhymeEngine.detectEndRhymes(lines);var tp=lc>1?(lc*(lc-1)/2):1;var rd=Math.min(1,rp.length/Math.max(1,tp)*3);
+    var ir=RhymeEngine.detectInternalRhymes(lines);var H=0;if(cw.length>0){var freq={};cw.forEach(function(w){freq[w]=(freq[w]||0)+1});var total=cw.length;Object.values(freq).forEach(function(n){var p=n/total;if(p>0)H-=p*Math.log2(p)})}
+    var avgS=lc>0?(syll/lc).toFixed(1):0;var scr=0;cw.join('').split('').forEach(function(c){scr+=(ss[c]||0)});
+    var wf={};cw.forEach(function(w){if(w.length>2)wf[w]=(wf[w]||0)+1});var tw=Object.entries(wf).sort(function(a,b){return b[1]-a[1]}).slice(0,15);
+    var bf={};for(var i=0;i<cw.length-1;i++){var bg=cw[i]+' '+cw[i+1];bf[bg]=(bf[bg]||0)+1}var tb=Object.entries(bf).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+    var stops=new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','have','has','had','do','does','did','will','would','could','should','it','its','this','that','i','me','my','we','our','you','your','he','him','his','she','her','they','them','their','not','no','so','if']);
+    var thematic=Object.entries(wf).filter(function(e){return !stops.has(e[0])&&e[0].length>3}).sort(function(a,b){return b[1]-a[1]}).slice(0,8);
+    return{chars:chars,wordCount:wc,syllables:syll,lineCount:lc,uniqueWords:uw,rhymeDensity:rd,rhymePairs:rp,internalRhymes:ir,H:H,avgSyll:avgS,scrabble:scr,topWords:tw,topBigrams:tb,thematic:thematic};
+  }
+  return{analyze:analyze};
+})();
+
+/* ====== HARMONIC ENGINE ====== */
+var HarmonicEngine=(function(){
+  var phases=[{name:'I — Establish',desc:'Introduce the theme.',color:'var(--acc)'},{name:'IV — Expand',desc:'Build upon the theme.',color:'var(--tl)'},{name:'V — Tension',desc:'Create contrast.',color:'var(--rd)'},{name:'I — Resolve',desc:'Return and conclude.',color:'var(--gn)'}];
+  function getPhase(li,tl){if(tl<=1)return 0;var p=li/Math.max(1,tl-1);if(p<.25)return 0;if(p<.5)return 1;if(p<.75)return 2;return 3}
+  return{phases:phases,getPhase:getPhase};
+})();
+
+/* ====== PROMPT ASSIST ====== */
+var PromptAssist=(function(){
+  var categories={scat:['doo','bop','skee-dee','bah-dah','wop','sha-la-la','dee-dee','skiddly','doo-wop','skrrt','brr','ayy'],adlibs:['yeah!','uh huh','come on','let\'s go','that\'s right','for real','oh snap','word up','no doubt','check it','bet','say less','on god','no cap','facts','sheesh','it\'s lit','period','yessir'],chants:['hey! ho!','na na na','la la la','oh-oh-oh','go go go','one more time','say it loud','run it back','turn it up'],gel:['and then','but wait','now hear this','picture this','imagine that','meanwhile','think about it','here\'s the thing','plot twist','hold up','real talk','lowkey','straight up'],slang:['bussin','finna','vibin','drippin','flexin','slippin','trippin','poppin','hittin','crushin','grindin','stacking','cappin','ballin','stuntin','slidin','pullin up','comin thru','movin different'],structure:['first of all','in the beginning','then came','suddenly','as time went on','before long','when all seemed lost','finally','in the end','from the jump','at the end of the day']};
+  function random(cat){var arr=categories[cat];return arr?arr[Math.floor(Math.random()*arr.length)]:''}
+  function randomAny(){var keys=Object.keys(categories);return random(keys[Math.floor(Math.random()*keys.length)])}
+  return{categories:categories,random:random,randomAny:randomAny};
+})();
+
+/* ====== DRUM MACHINE ====== */
+var DrumMachine=(function(){
+  var ctx=null,stepTimer=null,currentStep=0,nextStepTime=0;
+  var patterns={boombap:{kick:[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],snare:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],hihat:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]},lofi:{kick:[1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0],snare:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],hihat:[1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0]},metro:{kick:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],snare:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],hihat:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}};
+  function ensureCtx(){if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume()}}
+  function playKick(time){ensureCtx();var osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='triangle';osc.frequency.setValueAtTime(150,time);osc.frequency.exponentialRampToValueAtTime(40,time+.1);gain.gain.setValueAtTime(.8,time);gain.gain.exponentialRampToValueAtTime(.001,time+.4);osc.connect(gain);gain.connect(ctx.destination);osc.start(time);osc.stop(time+.4)}
+  function playSnare(time){ensureCtx();var bs=ctx.sampleRate*.15,buf=ctx.createBuffer(1,bs,ctx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<bs;i++)d[i]=Math.random()*2-1;var n=ctx.createBufferSource();n.buffer=buf;var f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=3000;f.Q.value=.8;var g=ctx.createGain();g.gain.setValueAtTime(.5,time);g.gain.exponentialRampToValueAtTime(.001,time+.15);n.connect(f);f.connect(g);g.connect(ctx.destination);n.start(time);n.stop(time+.15)}
+  function playHiHat(time){ensureCtx();var bs=ctx.sampleRate*.04,buf=ctx.createBuffer(1,bs,ctx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<bs;i++)d[i]=Math.random()*2-1;var n=ctx.createBufferSource();n.buffer=buf;var f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7000;var g=ctx.createGain();g.gain.setValueAtTime(.2,time);g.gain.exponentialRampToValueAtTime(.001,time+.04);n.connect(f);f.connect(g);g.connect(ctx.destination);n.start(time);n.stop(time+.04)}
+  function scheduler(){if(!S.drum.playing)return;ensureCtx();while(nextStepTime<ctx.currentTime+.1){var p=patterns[S.drum.pattern]||patterns.boombap;if(p.kick[currentStep])playKick(nextStepTime);if(p.snare[currentStep])playSnare(nextStepTime);if(p.hihat[currentStep])playHiHat(nextStepTime);nextStepTime+=(60/S.drum.bpm)/4;currentStep=(currentStep+1)%16}stepTimer=requestAnimationFrame(scheduler)}
+  function start(){ensureCtx();S.drum.playing=true;currentStep=0;nextStepTime=ctx.currentTime+.05;scheduler()}
+  function stop(){S.drum.playing=false;if(stepTimer){cancelAnimationFrame(stepTimer);stepTimer=null}}
+  function toggle(){S.drum.playing?stop():start()}
+  return{start:start,stop:stop,toggle:toggle,ensureCtx:ensureCtx};
+})();
+
+/* ====== TIMER AUDIO (clicking timer) ====== */
+var TimerAudio=(function(){
+  var ctx=null;
+  function ensureCtx(){if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)()}if(ctx.state==='suspended')ctx.resume()}
+  function tick(urgent){
+    if(!$('tickSound').checked)return;
+    ensureCtx();var now=ctx.currentTime;
+    var osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type='sine';osc.frequency.value=urgent?1200:800;
+    gain.gain.setValueAtTime(urgent?.25:.12,now);
+    gain.gain.exponentialRampToValueAtTime(.001,now+(urgent?.08:.05));
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start(now);osc.stop(now+(urgent?.08:.05));
+    if(urgent){var o2=ctx.createOscillator(),g2=ctx.createGain();o2.type='sine';o2.frequency.value=1500;g2.gain.setValueAtTime(.15,now+.1);g2.gain.exponentialRampToValueAtTime(.001,now+.16);o2.connect(g2);g2.connect(ctx.destination);o2.start(now+.1);o2.stop(now+.16)}
+  }
+  return{tick:tick};
+})();
+
+/* ====== COLLAB SYSTEM ====== */
+var CollabSystem=(function(){
+  function start(){S.collab.active=true;S.collab.p1=$('p1Name').value||'Player 1';S.collab.p2=$('p2Name').value||'Player 2';S.collab.time=parseInt($('turnTime').value)||60;S.collab.remaining=[S.collab.time,S.collab.time];S.collab.scores=[0,0];S.collab.turn=0;$('collabBar').classList.add('active');$('btnEndCollab').style.display='';$('btnStartCollab').style.display='none';updateDisplay();startTimer()}
+  function end(){S.collab.active=false;if(S.collab.timer)clearInterval(S.collab.timer);$('collabBar').classList.remove('active');$('btnEndCollab').style.display='none';$('btnStartCollab').style.display='';$('editor').contentEditable='true';$('turnTimer').classList.remove('urgent')}
+  function switchTurn(){var text=getEditorText();var words=text.split(/\s+/).filter(Boolean).length;var sc=totalSyllables(text);S.collab.scores[S.collab.turn]+=words*10+sc*5;if(S.collab.timer)clearInterval(S.collab.timer);S.collab.turn=S.collab.turn===0?1:0;S.collab.remaining[S.collab.turn]=S.collab.time;$('turnTimer').classList.remove('urgent');updateDisplay();startTimer()}
+  function startTimer(){if(S.collab.timer)clearInterval(S.collab.timer);S.collab.timer=setInterval(function(){S.collab.remaining[S.collab.turn]--;var rem=S.collab.remaining[S.collab.turn];updateTimerDisplay();if(rem<=10){$('turnTimer').classList.add('urgent');TimerAudio.tick(rem<=5)}else{$('turnTimer').classList.remove('urgent');TimerAudio.tick(false)}if(rem<=0){clearInterval(S.collab.timer);$('turnTimer').classList.remove('urgent');switchTurn()}},1000)}
+  function updateDisplay(){var t=S.collab.turn;var name=t===0?S.collab.p1:S.collab.p2;$('turnLabel').textContent=name+"'s Turn";$('turnLabel').className='turn-indicator '+(t===0?'p1':'p2');$('scoreP1').textContent=S.collab.p1.slice(0,8)+': '+S.collab.scores[0];$('scoreP2').textContent=S.collab.p2.slice(0,8)+': '+S.collab.scores[1];updateTimerDisplay()}
+  function updateTimerDisplay(){var rem=S.collab.remaining[S.collab.turn];var m=Math.floor(rem/60);var s=rem%60;$('turnTimer').textContent=m+':'+(s<10?'0':'')+s}
+  function coinFlip(){return new Promise(function(resolve){var result=Math.random()<.5?0:1;showModal('Coin Flip','<div style="text-align:center"><div class="coin flipping">'+(result===0?'1':'2')+'</div><p style="margin-top:12px">'+(result===0?S.collab.p1||'Player 1':S.collab.p2||'Player 2')+' goes first!</p></div>',[{id:'ok',label:'Start',cls:'btn-primary',fn:function(){S.collab.turn=result;resolve(result)}}])})}
+  return{start:start,end:end,switchTurn:switchTurn,coinFlip:coinFlip,updateDisplay:updateDisplay};
+})();
+
+/* ====== STORY ENGINE ====== */
+var StoryEngine=(function(){
+  var fateWords=['destiny','whisper','shadow','ember','horizon','silence','echo','thunder','midnight','aurora','crystal','velvet','phantom','zenith','abyss'];
+  function start(){S.story.active=true;S.story.trigger=$('storyTrigger').value;S.story.startTime=Date.now();$('storyStatus').classList.add('active');$('btnEndStory').style.display='';$('btnStartStory').style.display='none';
+    if(S.story.trigger==='timed'){var secs=parseInt(S.story.value)||120;S.story.timer=setInterval(function(){var elapsed=(Date.now()-S.story.startTime)/1000;var pct=Math.min(100,(elapsed/secs)*100);$('storyFill').style.width=pct+'%';$('storyLabel').textContent='Story: '+Math.floor(secs-elapsed)+'s remaining';if(elapsed>=secs)end()},500)}
+    else if(S.story.trigger==='fate'){S.story.fateWord=fateWords[Math.floor(Math.random()*fateWords.length)];$('storyLabel').textContent='Fate word hidden... keep writing'}
+    else{$('storyLabel').textContent='Writing... trigger: '+S.story.trigger}}
+  function checkTrigger(text){if(!S.story.active)return;var lower=text.toLowerCase();if(S.story.trigger==='stopword'&&S.story.value&&lower.indexOf(S.story.value.toLowerCase())!==-1){end();return}if(S.story.trigger==='stopsentence'&&S.story.value&&lower.indexOf(S.story.value.toLowerCase())!==-1){end();return}if(S.story.trigger==='fate'&&lower.indexOf(S.story.fateWord)!==-1){showModal('Fate Triggered!','The hidden word was: <strong>'+S.story.fateWord+'</strong>.',[{id:'ok',label:'Amazing',cls:'btn-primary',fn:function(){}}]);end()}}
+  function end(){S.story.active=false;if(S.story.timer){clearInterval(S.story.timer);S.story.timer=null}$('storyStatus').classList.remove('active');$('btnEndStory').style.display='none';$('btnStartStory').style.display=''}
+  return{start:start,checkTrigger:checkTrigger,end:end};
+})();
+
+/* ====== DICTATION ====== */
+var DictationEngine=(function(){
+  function init(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return false;var rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang='en-US';rec.onresult=function(e){var final='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript}if(final){$('editor').textContent+=final+' ';updateAll()}};rec.onerror=function(){stop()};rec.onend=function(){if(S.dictation.active)rec.start()};S.dictation.recognition=rec;return true}
+  function start(){if(!S.dictation.recognition&&!init())return;S.dictation.active=true;S.dictation.wasDrumPlaying=S.drum.playing;if(S.drum.playing)DrumMachine.stop();try{S.dictation.recognition.start()}catch(e){/* already started */}$('btnDictation').classList.add('active')}
+  function stop(){S.dictation.active=false;if(S.dictation.recognition)try{S.dictation.recognition.stop()}catch(e){/* ok */}if(S.dictation.wasDrumPlaying)DrumMachine.start();$('btnDictation').classList.remove('active')}
+  function toggle(){S.dictation.active?stop():start()}
+  return{toggle:toggle,start:start,stop:stop};
+})();
+
+/* ====== PLAYBACK ====== */
+var PlaybackEngine=(function(){
+  function speak(text,mode,bpm){stop();S.playback.playing=true;$('btnPlayback').innerHTML='<i class="fas fa-stop"></i>';var synth=window.speechSynthesis;
+    if(mode==='natural'){var u=new SpeechSynthesisUtterance(text);u.rate=.9;u.pitch=1;u.onend=function(){S.playback.playing=false;$('btnPlayback').innerHTML='<i class="fas fa-play"></i>'};synth.speak(u)}
+    else if(mode==='wordbeat'){var words=text.split(/\s+/).filter(Boolean);var interval=60000/bpm;var i=0;S.playback.timer=setInterval(function(){if(i>=words.length){stop();return}synth.speak(new SpeechSynthesisUtterance(words[i]));i++},interval)}
+    else if(mode==='linebar'){var lines=text.split('\n').filter(function(l){return l.trim()});var iv=(60000/bpm)*4;var idx=0;S.playback.timer=setInterval(function(){if(idx>=lines.length){stop();return}synth.speak(new SpeechSynthesisUtterance(lines[idx]));idx++},iv)}
+    else if(mode==='syllable'){var ws=text.split(/\s+/).filter(Boolean);var si=60000/bpm;var wi=0;S.playback.timer=setInterval(function(){if(wi>=ws.length){stop();return}var ut=new SpeechSynthesisUtterance(ws[wi]);ut.rate=Math.max(.5,countSyllables(ws[wi])*.8);synth.speak(ut);wi++},si)}}
+  function stop(){S.playback.playing=false;window.speechSynthesis.cancel();if(S.playback.timer){clearInterval(S.playback.timer);S.playback.timer=null}$('btnPlayback').innerHTML='<i class="fas fa-play"></i>'}
+  function toggle(){if(S.playback.playing)stop();else speak(getEditorText(),$('playbackMode').value,S.drum.bpm)}
+  return{toggle:toggle,stop:stop};
+})();
+
+/* ====== MODE ENGINE ====== */
+var ModeEngine=(function(){
+  var configs={freeform:{label:'Freeform Poetry',bumper:true,collab:false,structure:false,story:false},battle:{label:'Battle / Duel',bumper:false,collab:true,structure:false,story:false},horse:{label:'Follow the Leader',bumper:false,collab:true,structure:false,story:false},callresponse:{label:'Call & Response',bumper:false,collab:true,structure:true,story:false},story:{label:'Story Mode',bumper:true,collab:false,structure:false,story:true},structure:{label:'Structure Mode',bumper:true,collab:false,structure:true,story:false},harmonic:{label:'Harmonic Progression',bumper:true,collab:false,structure:false,story:false},analysis:{label:'Analysis Mode',bumper:true,collab:false,structure:false,story:false},dictation:{label:'Dictation Mode',bumper:true,collab:false,structure:false,story:false},performance:{label:'Performance Mode',bumper:true,collab:false,structure:false,story:false}};
+  function switchMode(mode){
+    S.mode=mode;var cfg=configs[mode]||configs.freeform;
+    $('bumper').classList.toggle('hidden',!cfg.bumper);$('modeLabel').textContent=cfg.label;
+    if(cfg.collab&&!S.collab.active){switchPanelTab('pBattle');showPanel()}
+    if(cfg.story){switchPanelTab('pBattle');showPanel()}
+    if(cfg.structure){$('structGuide').classList.add('active');switchPanelTab('pTools');showPanel()}else{$('structGuide').classList.remove('active')}
+    if(mode==='dictation')DictationEngine.start();else if(S.dictation.active)DictationEngine.stop();
+  }
+  return{configs:configs,switchMode:switchMode};
+})();
+
+/* ====== QR / SHARE ====== */
+function generateRoomCode(){var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';var code='';for(var i=0;i<6;i++)code+=chars.charAt(Math.floor(Math.random()*chars.length));return code}
+
+function generateQR(text,container){
+  container.innerHTML='';
+  if(typeof qrcode==='function'){
+    try{var qr=qrcode(0,'M');qr.addData(text.substring(0,800));qr.make();
+      var svg=qr.createSvgTag(4,0);container.innerHTML=svg;
+      var svgEl=container.querySelector('svg');if(svgEl){svgEl.style.maxWidth='180px';svgEl.style.maxHeight='180px';svgEl.style.display='block';svgEl.style.margin='0 auto'}
+    }catch(e){container.innerHTML='<div style="padding:20px;color:var(--tx3);font-size:.82rem">QR too large — use Copy buttons below</div>'}
+  }else{container.innerHTML='<div style="padding:20px;color:var(--tx3);font-size:.82rem">QR library loading...</div>'}
+}
+
+function createRoom(){
+  S.room.code=generateRoomCode();S.room.active=true;
+  $('roomCode').textContent=S.room.code;$('roomDisplay').style.display='block';
+  var text=getEditorText();var preview=text.length>300?text.substring(0,300)+'...':text;
+  var qrContent='VERSE:'+S.room.code+'\n'+(preview||'(empty session)');
+  generateQR(qrContent,$('qrBox'));
+}
+
+function getShareData(){
+  return JSON.stringify({v:1,room:S.room.code||'NONE',text:getEditorText(),mode:S.mode,ts:new Date().toISOString()});
+}
+
+function copyToClipboard(text,btnEl){
+  navigator.clipboard.writeText(text).then(function(){
+    if(btnEl){btnEl.classList.add('copied');var old=btnEl.innerHTML;btnEl.innerHTML='<i class="fas fa-check"></i> Copied!';setTimeout(function(){btnEl.classList.remove('copied');btnEl.innerHTML=old},2000)}
+  });
+}
+
+/* ====== INSERT IMAGE / TABLE ====== */
+function showImageDialog(){
+  showFormModal('Insert Image',[{id:'url',label:'Image URL',type:'url',placeholder:'https://example.com/image.png'},{id:'alt',label:'Alt Text',type:'text',placeholder:'Description'}],function(vals){
+    if(!vals.url)return;$('editor').focus();
+    document.execCommand('insertHTML',false,'<img src="'+vals.url.replace(/"/g,'&quot;')+'" alt="'+(vals.alt||'').replace(/"/g,'&quot;')+'" style="max-width:100%;height:auto;border-radius:4px;margin:8px 0">');
+    updateAll();
+  });
+}
+
+function showTableDialog(){
+  showFormModal('Insert Table',[{id:'rows',label:'Rows',type:'number',value:'3',placeholder:'3'},{id:'cols',label:'Columns',type:'number',value:'3',placeholder:'3'}],function(vals){
+    var rows=Math.min(20,Math.max(1,parseInt(vals.rows)||3));var cols=Math.min(10,Math.max(1,parseInt(vals.cols)||3));
+    var html='<table>';for(var r=0;r<rows;r++){html+='<tr>';for(var c=0;c<cols;c++){html+='<td>&nbsp;</td>'}html+='</tr>'}html+='</table><br>';
+    $('editor').focus();document.execCommand('insertHTML',false,html);updateAll();
+  });
+}
+
+/* ====== UI CONTROLLER ====== */
+function showPanel(){$('panel').classList.remove('hidden');$('btnMenu').classList.add('active')}
+function hidePanel(){$('panel').classList.add('hidden');$('btnMenu').classList.remove('active')}
+function togglePanel(){$('panel').classList.contains('hidden')?showPanel():hidePanel()}
+function switchPanelTab(tabId){
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.toggle('active',t.dataset.ptab===tabId)});
+  document.querySelectorAll('.ptab-content').forEach(function(c){c.classList.toggle('active',c.id===tabId)});
+}
+
+function updateAll(){
+  var text=getEditorText();var lines=getLines();S.text=text;S.lines=lines;S.lastWord=lastWordFn(text);
+  var words=text.split(/\s+/).filter(Boolean);
+  $('charCount').textContent=text.length;$('wordCount').textContent=words.length;
+  $('syllCount').textContent=totalSyllables(text);$('lineCount').textContent=lines.length;
+  if(S.phonetic.enabled&&S.lastWord){$('phoneticOut').textContent=Phonetic.convert(S.lastWord,S.phonetic.display);$('rimeOut').textContent='Rime: '+Phonetic.getRime(S.lastWord)}
+  if(ModeEngine.configs[S.mode]&&ModeEngine.configs[S.mode].structure){var form=$('formSelect').value;var guidance=StructureEngine.getGuidance(form,lines.length);if(guidance){$('structHint').textContent=guidance;$('structGuide').classList.add('active')}}
+  if(S.story.active)StoryEngine.checkTrigger(text);
+  S.prompt.lastType=Date.now();
+}
+
+var updateAnalytics=debounce(function(){
+  var text=getEditorText();if(!text.trim())return;var m=Metrics.analyze(text);
+  $('mRhymeDens').textContent=Math.round(m.rhymeDensity*100)+'%';$('mRhymeDensBar').style.width=Math.round(m.rhymeDensity*100)+'%';
+  $('mIntRhymes').textContent=m.internalRhymes;$('mShannon').textContent=m.H.toFixed(2);$('mShannonBar').style.width=Math.min(100,m.H*15)+'%';
+  $('mAvgSyll').textContent=m.avgSyll;$('mUnique').textContent=m.uniqueWords;$('mScrabble').textContent=m.scrabble;
+  $('rhymePairs').innerHTML=m.rhymePairs.length?m.rhymePairs.map(function(p){return '<div style="padding:3px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--acc)">'+p.a+'</span> ↔ <span style="color:var(--tl)">'+p.b+'</span> <span style="color:var(--tx3)">(L'+(p.lines[0]+1)+', L'+(p.lines[1]+1)+')</span></div>'}).join(''):'<span style="color:var(--tx3)">No end rhymes detected yet</span>';
+  $('wordFreq').innerHTML=m.topWords.map(function(e){var heat=Math.min(1,e[1]/5);return '<span class="freq-word" style="background:rgba(232,168,72,'+(0.1+heat*0.3)+');color:var(--acc)">'+e[0]+' ('+e[1]+')</span>'}).join('');
+  $('bigramFreq').innerHTML=m.topBigrams.map(function(e){return '<span class="freq-word" style="background:var(--tld);color:var(--tl)">'+e[0]+' ('+e[1]+')</span>'}).join('');
+  $('thematicWords').textContent=m.thematic.map(function(e){return e[0]}).join(', ')||'—';
+  var lines=getLines();
+  ['arc1','arc2','arc3','arc4'].forEach(function(id,i){var el=$(id);var phase=HarmonicEngine.getPhase(lines.length-1,Math.max(lines.length,4));el.style.background=phase===i?HarmonicEngine.phases[i].color:'var(--bg3)';el.style.color=phase===i?'#111':'var(--tx3)'});
+  $('arcDisplay').textContent=lines.length>0?HarmonicEngine.phases[HarmonicEngine.getPhase(lines.length-1,Math.max(lines.length,4))].desc:'Write to see arc guidance.';
+},400);
+
+var updateRhymeSuggest=debounce(function(){
+  var strip=$('rsChips'),wordEl=$('rsWord');
+  if(!S.lastWord){wordEl.textContent='';strip.innerHTML='<span style="color:var(--tx3);font-size:.78rem;padding:4px">Type to see rhyme suggestions...</span>';return}
+  wordEl.textContent=S.lastWord;
+  var dr=RhymeEngine.findRhymes(S.lastWord,12);var rng=RhymeEngine.generateAlphabetSweep(S.lastWord,4);
+  var chips='';dr.forEach(function(w,idx){chips+='<span class="rhyme-chip" data-word="'+w+'" style="animation-delay:'+idx*30+'ms">'+w+'</span>'});
+  if(S.phonetic.enabled){dr.slice(0,2).forEach(function(w,idx){chips+='<span class="rhyme-chip phonetic" data-word="'+w+'" style="animation-delay:'+(dr.length+idx)*30+'ms">'+Phonetic.convert(w,S.phonetic.display)+'</span>'})}
+  rng.slice(0,3).forEach(function(w,idx){if(dr.indexOf(w)===-1)chips+='<span class="rhyme-chip generated" data-word="'+w+'" style="animation-delay:'+(dr.length+idx+2)*30+'ms">'+w+'*</span>'});
+  strip.innerHTML=chips||'<span style="color:var(--tx3);font-size:.78rem;padding:4px">No rhymes found</span>';
+},350);
+
+function insertAtCursor(text){
+  var ed=$('editor');ed.focus();var sel=window.getSelection();
+  if(sel.rangeCount){var range=sel.getRangeAt(0);range.deleteContents();range.insertNode(document.createTextNode(text+' '));range.collapse(false);sel.removeAllRanges();sel.addRange(range)}
+  else{ed.textContent+=text+' '}
+  updateAll();updateAnalytics();updateRhymeSuggest();
+}
+
+function exportSession(){
+  var data={version:1,text:getEditorText(),mode:S.mode,phonetic:S.phonetic,structure:{form:$('formSelect').value},timestamp:new Date().toISOString()};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='verse-session-'+Date.now()+'.json';a.click();URL.revokeObjectURL(a.href);
+}
+function importSession(file){
+  var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(data.text){$('editor').textContent=data.text;updateAll();updateAnalytics();updateRhymeSuggest()}if(data.mode){$('modeSelect').value=data.mode;ModeEngine.switchMode(data.mode)}if(data.structure&&data.structure.form)$('formSelect').value=data.structure.form}catch(err){showModal('Import Error','Could not parse file.',[{id:'ok',label:'OK',cls:'btn-primary',fn:function(){}}])}};
+  reader.readAsText(file);
+}
+
+function updateStoryConfig(){
+  var trigger=$('storyTrigger').value;var html='';
+  if(trigger==='timed')html='<label style="font-size:.82rem;color:var(--tx2)">Duration (sec)</label><input type="number" id="storyTimerVal" value="120" min="10" max="3600" style="font-size:16px">';
+  else if(trigger==='stopword')html='<label style="font-size:.82rem;color:var(--tx2)">Stop Word</label><input type="text" id="storyStopVal" placeholder="e.g. goodbye" style="font-size:16px">';
+  else if(trigger==='stopsentence')html='<label style="font-size:.82rem;color:var(--tx2)">Stop Sentence</label><input type="text" id="storyStopVal" placeholder="e.g. the end" style="font-size:16px">';
+  else if(trigger==='fate')html='<p style="font-size:.82rem;color:var(--tx2)">A random word will end the story!</p>';
+  $('storyConfig').innerHTML=html;
+}
+
+function buildPromptUI(){
+  var container=$('promptCategories');
+  Object.entries(PromptAssist.categories).forEach(function(entry){var key=entry[0],words=entry[1];var div=document.createElement('div');
+    div.innerHTML='<h4 style="font-size:.78rem;color:var(--acc);text-transform:capitalize;margin-bottom:4px">'+key+'</h4><div style="display:flex;flex-wrap:wrap;gap:4px">'+words.slice(0,6).map(function(w){return '<span class="rhyme-chip" data-prompt="'+w+'" style="font-size:.75rem">'+w+'</span>'}).join('')+'</div>';
+    container.appendChild(div)});
+}
+
+function updateFormGuide(){var form=$('formSelect').value;var f=StructureEngine.forms[form];$('formGuide').textContent=f?f.desc:''}
+
+setInterval(function(){
+  if(S.mode==='battle'||S.mode==='horse')return;
+  var elapsed=Date.now()-S.prompt.lastType;
+  if(elapsed>4000&&!S.prompt.showing&&getEditorText().trim().length>10){
+    var suggestion=PromptAssist.randomAny();$('promptText').textContent=suggestion;$('promptBubble').classList.add('show');S.prompt.showing=true}
+},2000);
+
+/* ====== INIT ====== */
+(function init(){
+  $('editor').addEventListener('input',function(){updateAll();updateAnalytics();updateRhymeSuggest()});
+  document.querySelectorAll('[data-cmd]').forEach(function(btn){btn.addEventListener('click',function(){document.execCommand(btn.dataset.cmd,false,null);$('editor').focus()})});
+  $('btnClearFmt').addEventListener('click',function(){document.execCommand('removeFormat',false,null);$('editor').focus()});
+  $('btnUL').addEventListener('click',function(){document.execCommand('insertUnorderedList',false,null);$('editor').focus()});
+  $('btnOL').addEventListener('click',function(){document.execCommand('insertOrderedList',false,null);$('editor').focus()});
+  $('btnImgTB').addEventListener('click',showImageDialog);
+  $('btnTblTB').addEventListener('click',showTableDialog);
+  $('btnInsertImage').addEventListener('click',showImageDialog);
+  $('btnInsertTable').addEventListener('click',showTableDialog);
+  $('fontSelect').addEventListener('change',function(e){$('editor').style.fontFamily=e.target.value});
+  $('sizeSelect').addEventListener('change',function(e){$('editor').style.fontSize=e.target.value});
+  $('btnMenu').addEventListener('click',togglePanel);
+  document.querySelectorAll('.ptab').forEach(function(tab){tab.addEventListener('click',function(){switchPanelTab(tab.dataset.ptab)})});
+  $('modeSelect').addEventListener('change',function(e){ModeEngine.switchMode(e.target.value)});
+  $('btnPhonetic').addEventListener('click',function(){S.phonetic.enabled=!S.phonetic.enabled;$('btnPhonetic').classList.toggle('active',S.phonetic.enabled);if(S.phonetic.enabled){showPanel();switchPanelTab('pTools')}updateAll();updateRhymeSuggest()});
+  $('phoneticMode').addEventListener('change',function(e){S.phonetic.display=e.target.value;updateAll()});
+  $('formSelect').addEventListener('change',updateFormGuide);updateFormGuide();
+  $('btnStartCollab').addEventListener('click',function(){CollabSystem.start()});
+  $('btnEndCollab').addEventListener('click',function(){CollabSystem.end()});
+  $('btnSwitchTurn').addEventListener('click',function(){if(S.collab.active)CollabSystem.switchTurn()});
+  $('btnCoinFlip').addEventListener('click',function(){S.collab.p1=$('p1Name').value||'Player 1';S.collab.p2=$('p2Name').value||'Player 2';CollabSystem.coinFlip().then(function(){CollabSystem.updateDisplay()})});
+  $('storyTrigger').addEventListener('change',updateStoryConfig);updateStoryConfig();
+  $('btnStartStory').addEventListener('click',function(){var trigger=$('storyTrigger').value;if(trigger==='timed'){var v=$('storyTimerVal');S.story.value=v?v.value:'120'}else if(trigger==='stopword'||trigger==='stopsentence'){var sv=$('storyStopVal');S.story.value=sv?sv.value:''}StoryEngine.start()});
+  $('btnEndStory').addEventListener('click',function(){StoryEngine.end()});
+  $('btnDictation').addEventListener('click',function(){DictationEngine.toggle()});
+  $('btnPlayback').addEventListener('click',function(){PlaybackEngine.toggle()});
+  $('btnDrum').addEventListener('click',function(){DrumMachine.toggle();$('btnDrum').classList.toggle('playing',S.drum.playing)});
+  $('drumPattern').addEventListener('change',function(e){S.drum.pattern=e.target.value});
+  $('bpmSlider').addEventListener('input',function(e){S.drum.bpm=parseInt(e.target.value);$('bpmVal').textContent=e.target.value});
+  $('rsChips').addEventListener('click',function(e){var chip=e.target.closest('.rhyme-chip');if(chip)insertAtCursor(chip.dataset.word||chip.textContent.replace('*',''))});
+  $('promptCategories').addEventListener('click',function(e){var chip=e.target.closest('[data-prompt]');if(chip)insertAtCursor(chip.dataset.prompt)});
+  $('btnInsertPrompt').addEventListener('click',function(){insertAtCursor($('promptText').textContent);$('promptBubble').classList.remove('show');S.prompt.showing=false});
+  $('btnDismissPrompt').addEventListener('click',function(){$('promptBubble').classList.remove('show');S.prompt.showing=false});
+  $('btnExport').addEventListener('click',exportSession);
+  $('btnImport').addEventListener('click',function(){$('importFile').click()});
+  $('importFile').addEventListener('change',function(e){if(e.target.files.length)importSession(e.target.files[0]);e.target.value=''});
+  $('btnCreateRoom').addEventListener('click',createRoom);
+  $('btnCopyLink').addEventListener('click',function(){var data=getShareData();copyToClipboard(data,$('btnCopyLink'))});
+  $('btnTextInvite').addEventListener('click',function(){
+    var text=getEditorText();var preview=text.length>200?text.substring(0,200)+'...':text;
+    var msg='🎤 Verse Engine Session\nRoom: '+(S.room.code||'N/A')+'\n\n'+preview+'\n\n--- Session Data ---\n'+getShareData();
+    copyToClipboard(msg,$('btnTextInvite'));
+  });
+  $('btnJoinRoom').addEventListener('click',function(){
+    var raw=$('joinData').value.trim();if(!raw){showModal('No Data','Paste shared session data first.',[{id:'ok',label:'OK',cls:'btn-primary',fn:function(){}}]);return}
+    try{var idx=raw.indexOf('{');var jsonStr=idx>=0?raw.substring(idx):raw;var data=JSON.parse(jsonStr);
+      if(data.text){$('editor').textContent=data.text;updateAll();updateAnalytics();updateRhymeSuggest()}
+      if(data.mode){$('modeSelect').value=data.mode;ModeEngine.switchMode(data.mode)}
+      if(data.room){S.room.code=data.room;S.room.active=true;$('roomCode').textContent=data.room;$('roomDisplay').style.display='block';generateQR('VERSE:'+data.room,$('qrBox'))}
+      $('joinData').value='';showModal('Joined!','Session loaded successfully.',[{id:'ok',label:'OK',cls:'btn-primary',fn:function(){}}]);
+    }catch(err){showModal('Parse Error','Could not read session data. Make sure you pasted the complete data.',[{id:'ok',label:'OK',cls:'btn-primary',fn:function(){}}])}
+  });
+  buildPromptUI();
+  ModeEngine.switchMode('freeform');
+})();
+</script>
+</body>
+</html>
